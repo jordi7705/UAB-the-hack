@@ -1,0 +1,22 @@
+# Secrets i entorn
+.env
+.env.*
+!.env.example
+
+# Entorn virtual de Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Dades i exports
+*.csv
+*.xlsx
+Applicación/data/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Sistema
+.DS_Store
+Thumbs.db
