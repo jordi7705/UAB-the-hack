@@ -74,20 +74,23 @@ p, li, label, span, div { font-size: 0.98rem; }
 [data-testid="stSidebar"] .stRadio label p { color: #F1E4D8 !important; font-weight: 500; }
 [data-testid="stSidebar"] .stRadio [role="radiogroup"] { gap: 0.15rem; }
 [data-testid="stSidebar"] .stRadio label:hover p { color: #FFFFFF !important; }
-[data-testid="stSidebar"] .stRadio [role="radiogroup"] label {
+/* Cada opción del menú (Streamlit >= 1.4x: <label data-testid="stRadioOption">) */
+[data-testid="stSidebar"] [data-testid="stRadioOption"] {
     padding: 0.38rem 0.65rem;
     border-radius: 9px;
     transition: background 0.15s ease;
 }
-[data-testid="stSidebar"] .stRadio [role="radiogroup"] label:hover {
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:hover {
     background: rgba(255,255,255,0.06);
 }
-[data-testid="stSidebar"] .stRadio [role="radiogroup"] label:has(input:checked) {
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:has(input:checked),
+[data-testid="stSidebar"] [data-testid="stRadioOption"][data-selected] {
     background: rgba(250,182,38,0.16);
     box-shadow: inset 3px 0 0 #FAB626;
 }
-[data-testid="stSidebar"] .stRadio [role="radiogroup"] label > div:first-child {
-    display: none;
+/* Oculta el círculo del radio: es el primer div dentro del contenedor flex de la opción */
+[data-testid="stSidebar"] [data-testid="stRadioOption"] > div > div:first-child:not(:last-child) {
+    display: none !important;
 }
 [data-testid="stSidebar"] .stButton > button {
     background: rgba(250,182,38,0.14);
@@ -124,7 +127,7 @@ p, li, label, span, div { font-size: 0.98rem; }
     width: 40px; height: 40px; border-radius: 12px;
     background: linear-gradient(135deg, var(--gold), #D99A12);
     color: #831B1E; display: flex; align-items: center; justify-content: center;
-    font-size: 1.3rem; font-weight: 700;
+    font-size: 1.5rem; font-weight: 700; line-height: 1;
     box-shadow: 0 6px 18px rgba(250,182,38,0.35);
 }
 .brand-name {
@@ -316,8 +319,51 @@ textarea {
 
 hr { border-color: var(--line); }
 
-/* Amaga la barra d'eines de Streamlit (Stop / Deploy) durant la demo */
-[data-testid="stToolbar"] { display: none; }
+/* Amaga Deploy i el menú de Streamlit durant la demo, però NO la barra sencera:
+   dins hi ha el botó per tornar a obrir la barra lateral. */
+[data-testid="stToolbarActions"],
+[data-testid="stAppDeployButton"],
+[data-testid="stMainMenu"] { display: none !important; }
+
+/* Botó per reobrir la barra lateral: visible i amb els colors de la marca */
+[data-testid="stExpandSidebarButton"] {
+    display: flex !important;
+    background: var(--maroon);
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(131,27,30,0.25);
+}
+[data-testid="stExpandSidebarButton"],
+[data-testid="stExpandSidebarButton"] * { color: #FFFFFF !important; fill: #FFFFFF !important; }
+[data-testid="stExpandSidebarButton"]:hover { background: #A3262A; }
+
+/* Títols de Streamlit (st.markdown("### ...")): els estils propis de Streamlit
+   (Source Sans, pes 600, color de text) guanyaven a la regla global. */
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h1,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h2,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h3,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h4,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h5,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h6 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    color: var(--maroon);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+}
+/* El text del títol va dins d'un span/div: sense això la regla global
+   "span, div { font-size: 0.98rem }" l'encongeix. */
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h1 *,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h2 *,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h3 *,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h4 *,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h5 *,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h6 * {
+    font-size: inherit; font-family: inherit; color: inherit;
+    font-weight: inherit; line-height: inherit; letter-spacing: inherit;
+}
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h3 { font-size: 1.6rem; }
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h4 { font-size: 1.3rem; }
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h5 { font-size: 1.12rem; }
 
 /* Botones desactivados (p. ej. publicar sin aprobación humana) */
 .stButton > button:disabled {
@@ -351,9 +397,9 @@ def marca() -> None:
     st.markdown(
         """
         <div class="brand">
-            <div class="brand-star">✦</div>
+            <div class="brand-star">★</div>
             <div>
-                <div class="brand-name">Escolta</div>
+                <div class="brand-name">EscoltDamm</div>
                 <div class="brand-sub">Damm · UAB The Hack 2026</div>
             </div>
         </div>
