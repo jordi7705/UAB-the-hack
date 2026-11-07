@@ -43,12 +43,12 @@ PAGINES = [
     "Guió de demo",
 ]
 
-COLORS = ["#0B1F3A", "#D9A441", "#2F7D5C", "#B3122E", "#5D6B7A", "#7FA6C9"]
+COLORS = ["#831B1E", "#FAB626", "#2F7D5C", "#E32819", "#6F5F5A", "#C9A66B"]
 STATUS_COLORS = {
     "Adequat": "#2F7D5C",
-    "Sobre-representat": "#7FA6C9",
-    "Infrarepresentat": "#B3122E",
-    "Ocult (llindar)": "#5D6B7A",
+    "Sobre-representat": "#FAB626",
+    "Infrarepresentat": "#E32819",
+    "Ocult (llindar)": "#6F5F5A",
 }
 
 
@@ -56,7 +56,7 @@ def init_state() -> None:
     valors = {
         "seed": 42,
         "n_respostes": 640,
-        "llindar": 8,
+        "llindar": analisis.LLINDAR_PCT_DEFECTE,
         "nav": "Inici",
         "necessitat": None,
         "consulta": None,
@@ -90,11 +90,11 @@ def estil_fig(fig: go.Figure, height: int = 340, marge_esq: int = 10) -> go.Figu
         margin=dict(l=0, r=10, t=28, b=10),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter, sans-serif", color="#1C2430", size=12),
+        font=dict(family="Inter, sans-serif", color="#241715", size=12),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0, title=None),
-        hoverlabel=dict(bgcolor="#0B1F3A", font_color="#FFFFFF", bordercolor="#0B1F3A"),
+        hoverlabel=dict(bgcolor="#831B1E", font_color="#FFFFFF", bordercolor="#831B1E"),
     )
-    fig.update_xaxes(showgrid=True, gridcolor="#EAE3D6", zeroline=False)
+    fig.update_xaxes(showgrid=True, gridcolor="#EFE2CC", zeroline=False)
     fig.update_yaxes(showgrid=False, zeroline=False)
     return fig
 
@@ -118,15 +118,15 @@ with st.sidebar:
     st.markdown("---")
     st.markdown(
         "<div style='font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;"
-        "color:#9FB2C8;font-weight:700;margin-bottom:0.4rem'>Dades de demo</div>",
+        "color:#D8B7A8;font-weight:700;margin-bottom:0.4rem'>Dades de demo</div>",
         unsafe_allow_html=True,
     )
     st.markdown(
-        f"<div style='font-size:0.85rem;color:#DCE4EE'>{len(df_global):,} respostes sintètiques<br>"
+        f"<div style='font-size:0.85rem;color:#F1E4D8'>{len(df_global):,} respostes sintètiques<br>"
         f"2 períodes · seed {st.session_state.seed}</div>",
         unsafe_allow_html=True,
     )
-    st.slider("Llindar mínim per segment", 5, 10, key="llindar")
+    st.slider("Llindar mínim per col·lectiu (% de la població)", 5, 25, key="llindar", format="%d%%")
     if st.button("Regenerar dades", width="stretch"):
         st.session_state.seed += 1
         st.cache_data.clear()
@@ -134,7 +134,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown(
-        "<div style='font-size:0.74rem;color:#9FB2C8;line-height:1.5'>"
+        "<div style='font-size:0.74rem;color:#D8B7A8;line-height:1.5'>"
         "Prototip de demo.<br>Cap dada real de Damm ni de persones treballadores.<br>"
         "No és una eina de vigilància.</div>",
         unsafe_allow_html=True,
@@ -242,7 +242,7 @@ def pagina_inici() -> None:
             st.markdown(
                 f"<div class='callout' style='min-height:190px'>"
                 f"<div class='callout-title'>{titol}</div>"
-                f"<div style='color:#5D6B7A;font-size:0.9rem;line-height:1.45;margin:0.35rem 0 0.6rem 0'>{text}</div>"
+                f"<div style='color:#6F5F5A;font-size:0.9rem;line-height:1.45;margin:0.35rem 0 0.6rem 0'>{text}</div>"
                 f"{ui.pill(tag, 'gold')}</div>",
                 unsafe_allow_html=True,
             )
@@ -371,7 +371,7 @@ def pagina_nova_consulta() -> None:
     st.markdown("<div style='height:0.7rem'></div>", unsafe_allow_html=True)
 
     st.markdown(f"### {consulta['titol']}")
-    st.markdown(f"<div style='color:#5D6B7A;max-width:820px'>{consulta['intro']}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='color:#6F5F5A;max-width:820px'>{consulta['intro']}</div>", unsafe_allow_html=True)
 
     with st.expander("Per què aquesta proposta? (traçabilitat)", expanded=False):
         st.markdown(
@@ -502,10 +502,10 @@ def pagina_participacio() -> None:
     if col_sel:
         df = df[df["col·lectiu"].isin(col_sel)]
 
-    if len(df) < llindar:
+    if len(df) < analisis.ANONIMAT_MIN:
         ui.callout(
             "Segment ocult per privacitat",
-            f"Aquesta combinació té només {len(df)} respostes. Per sota del llindar de {llindar} "
+            f"Aquesta combinació té només {len(df)} respostes. Per sota del llindar de {analisis.ANONIMAT_MIN} "
             "no es mostren resultats: mai no es poden inferir respostes individuals.",
             "danger",
         )
@@ -523,7 +523,7 @@ def pagina_participacio() -> None:
     with cols[2]:
         ui.metrica(f"±{k['marge_error']} pp", "Marge d'error global", "95% de confiança")
     with cols[3]:
-        ui.metrica(f"{len(alertes)}", "Segments a vigilar", f"llindar mínim: {llindar}")
+        ui.metrica(f"{len(alertes)}", "Segments a vigilar", f"llindar mínim: {llindar}% per col·lectiu")
 
     st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
 
@@ -537,7 +537,7 @@ def pagina_participacio() -> None:
                 x=taula["Pes població"],
                 name="Pes a la població",
                 orientation="h",
-                marker_color="#C9D3DF",
+                marker_color="#D9C9B5",
                 text=taula["Pes població"].astype(str) + "%",
                 textposition="outside",
             )
@@ -548,7 +548,7 @@ def pagina_participacio() -> None:
                 x=taula["Pes mostra"],
                 name="Pes a la mostra",
                 orientation="h",
-                marker_color="#0B1F3A",
+                marker_color="#831B1E",
                 text=taula["Pes mostra"].astype(str) + "%",
                 textposition="outside",
             )
@@ -565,7 +565,7 @@ def pagina_participacio() -> None:
             names="canal",
             values="Respostes",
             hole=0.62,
-            color_discrete_sequence=["#0B1F3A", "#D9A441", "#2F7D5C"],
+            color_discrete_sequence=["#831B1E", "#FAB626", "#2F7D5C"],
         )
         fig.update_traces(textinfo="percent", textfont_size=12)
         fig.update_layout(showlegend=True)
@@ -642,17 +642,17 @@ def pagina_analisi() -> None:
     if nomes_amb_text:
         df = df[df["comentari_net"].astype(str).str.strip() != ""]
 
-    if len(df) < llindar:
+    if len(df) < analisis.ANONIMAT_MIN:
         ui.callout(
             "Segment ocult per privacitat",
-            f"Només {len(df)} respostes amb els filtres actuals. Per sota de {llindar} no es mostra cap anàlisi.",
+            f"Només {len(df)} respostes amb els filtres actuals. Per sota de {analisis.ANONIMAT_MIN} no es mostra cap anàlisi.",
             "danger",
         )
         return
 
     resum = analisis.resum_temes(df)
     evolucio = analisis.evolucio_temes(df_global.copy()) if periode == "Tots" else pd.DataFrame()
-    precisio = analisis.precisio_classificacio_millor(df_global)
+    precisio = analisis.precisio_classificacio(df_global)
     n_pii = int((df_global["pii_eliminada"].astype(str).str.strip() != "").sum())
 
     cols = st.columns(4)
@@ -678,7 +678,7 @@ def pagina_analisi() -> None:
                 y="Tema",
                 orientation="h",
                 color="Sentiment mitjà",
-                color_continuous_scale=["#B3122E", "#E8D9B5", "#2F7D5C"],
+                color_continuous_scale=["#E32819", "#E8D9B5", "#2F7D5C"],
                 range_color=[-1, 1],
                 text="Respostes",
             )
@@ -689,7 +689,7 @@ def pagina_analisi() -> None:
         st.markdown("##### Sentiment mitjà per tema")
         if not resum.empty:
             r = resum.sort_values("Sentiment mitjà")
-            colors = ["#B3122E" if v < 0 else "#2F7D5C" for v in r["Sentiment mitjà"]]
+            colors = ["#E32819" if v < 0 else "#2F7D5C" for v in r["Sentiment mitjà"]]
             fig = go.Figure(
                 go.Bar(
                     x=r["Sentiment mitjà"],
@@ -712,8 +712,8 @@ def pagina_analisi() -> None:
             "info",
         )
         fig = go.Figure()
-        fig.add_trace(go.Bar(x=evolucio["Tema"], y=evolucio["T3 (%)"], name="2026-T3", marker_color="#C9D3DF"))
-        fig.add_trace(go.Bar(x=evolucio["Tema"], y=evolucio["T4 (%)"], name="2026-T4", marker_color="#0B1F3A"))
+        fig.add_trace(go.Bar(x=evolucio["Tema"], y=evolucio["T3 (%)"], name="2026-T3", marker_color="#D9C9B5"))
+        fig.add_trace(go.Bar(x=evolucio["Tema"], y=evolucio["T4 (%)"], name="2026-T4", marker_color="#831B1E"))
         fig.update_layout(barmode="group")
         fig.update_xaxes(tickangle=-30)
         fig.update_yaxes(ticksuffix="%")
@@ -735,7 +735,7 @@ def pagina_analisi() -> None:
                 )
         with e2:
             st.markdown("##### Senyals febles")
-            febles = analisis.senyals_febles(df, evolucio, llindar)
+            febles = analisis.senyals_febles(df, evolucio)
             if febles.empty:
                 st.caption("No s'han detectat senyals febles amb els criteris actuals.")
             for _, row in febles.iterrows():
@@ -749,7 +749,7 @@ def pagina_analisi() -> None:
                 )
 
     st.markdown("##### Comentaris agrupats per tema")
-    cites = analisis.cites_per_tema(df, llindar)
+    cites = analisis.cites_per_tema(df)
     if not cites:
         st.caption("No hi ha prou comentaris per tema per mostrar cites amb garanties.")
     for tema, llista in cites.items():
@@ -806,7 +806,7 @@ def pagina_insights() -> None:
     st.markdown("##### Accions proposades")
     for _, row in recs.iterrows():
         st.markdown(
-            f"<div class='callout' style='margin-bottom:0.6rem;border-left:4px solid #D9A441'>"
+            f"<div class='callout' style='margin-bottom:0.6rem;border-left:4px solid #FAB626'>"
             f"<div style='display:flex;justify-content:space-between;gap:1rem;align-items:center'>"
             f"<div><b>{row['Prioritat']}. {row['Tema']}</b><br>"
             f"<span style='font-size:0.92rem'>{row['Acció proposada']}</span><br>"
@@ -888,14 +888,14 @@ def pagina_privacitat() -> None:
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        ui.callout("Sempre agregat", "Mai es mostren respostes individuals. El llindar mínim per segment és configurable (5-10).", "ok")
+        ui.callout("Sempre agregat", "Mai es mostren respostes individuals. El llindar mínim és un percentatge de la població de cada col·lectiu (configurable, 5-25%) i mai baixa de 8 respostes en cites i senyals.", "ok")
     with c2:
         ui.callout("Minimització", "Només es recullen els camps necessaris. Els comentaris es netegen de PII abans d'analitzar-los.", "ok")
     with c3:
         ui.callout("Control humà", "La IA proposa consultes i recomanacions; les persones validen abans de publicar i actuar.", "ok")
 
     st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
-    ui.seccio("Configuració", "Llindar mínim de mostra", "Prova com canvia el dashboard en moure el llindar.")
+    ui.seccio("Configuració", "Llindar mínim de mostra", "Prova com canvia el dashboard en moure el llindar (% de la població de cada col·lectiu).")
 
     if "llindar_privacy" not in st.session_state:
         st.session_state.llindar_privacy = st.session_state.llindar
@@ -904,18 +904,19 @@ def pagina_privacitat() -> None:
         st.session_state.llindar = int(st.session_state.llindar_privacy)
 
     st.slider(
-        "Respostes mínimes per mostrar un segment",
+        "Taxa de resposta mínima per mostrar un col·lectiu (% de la població)",
         5,
-        10,
+        25,
         key="llindar_privacy",
         on_change=_canvia_llindar,
+        format="%d%%",
     )
 
     taula = analisis.taula_participacio(df_global, st.session_state.llindar)
-    ocults = taula[taula["Respostes"] < st.session_state.llindar]
+    ocults = taula[taula["Respostes"] < taula["Mínim"]]
     st.markdown(
         f"Amb el llindar actual, **{len(ocults)} col·lectius** quedarien ocults. "
-        f"El total mostrat seria de **{int(taula[taula['Respostes'] >= st.session_state.llindar]['Respostes'].sum()):,} respostes**."
+        f"El total mostrat seria de **{int(taula[taula['Respostes'] >= taula['Mínim']]['Respostes'].sum()):,} respostes**."
     )
 
     st.markdown("##### Esquema de dades (orientatiu)")
@@ -1030,7 +1031,7 @@ PAGINA_FN[st.session_state.nav]()
 
 st.markdown("<div style='height:1.4rem'></div>", unsafe_allow_html=True)
 st.markdown(
-    "<div style='text-align:center;color:#8A94A3;font-size:0.75rem'>"
+    "<div style='text-align:center;color:#9A8A82;font-size:0.75rem'>"
     "Escolta · prototip de demo · dades 100% sintètiques · no és una eina de vigilància"
     "</div>",
     unsafe_allow_html=True,

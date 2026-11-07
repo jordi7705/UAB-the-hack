@@ -13,8 +13,6 @@ import math
 
 import pandas as pd
 
-from sklearn.metrics import f1_score
-
 from datos import POBLACIO, TEMES, TEMES_ORDRE
 
 
@@ -31,7 +29,18 @@ def marge_error(n: int, poblacio: int, z: float = 1.96) -> float:
     return round(moe * 100, 1)
 
 
-def taula_participacio(df: pd.DataFrame, llindar: int = 8) -> pd.DataFrame:
+# Mínim absolut per protegir l'anonimat (cites, senyals febles i talls filtrats).
+ANONIMAT_MIN = 8
+# Mínim de respostes per col·lectiu, com a % de la seva població.
+LLINDAR_PCT_DEFECTE = 15
+
+
+def llindar_colectiu(col: str, llindar_pct: float = LLINDAR_PCT_DEFECTE) -> int:
+    """Respostes mínimes per mostrar un col·lectiu: llindar_pct % de la seva població."""
+    return math.ceil(POBLACIO[col] * llindar_pct / 100)
+
+
+def taula_participacio(df: pd.DataFrame, llindar_pct: float = LLINDAR_PCT_DEFECTE) -> pd.DataFrame:
     total_mostra = len(df)
     total_poblacio = sum(POBLACIO.values())
     files = []
@@ -43,7 +52,8 @@ def taula_participacio(df: pd.DataFrame, llindar: int = 8) -> pd.DataFrame:
         pes_mostra = (n / total_mostra * 100) if total_mostra else 0.0
         pes_poblacio = poblacio / total_poblacio * 100
         desviacio = pes_mostra - pes_poblacio
-        if n < llindar:
+        minim = llindar_colectiu(col, llindar_pct)
+        if n < minim:
             estat = "Ocult (llindar)"
         elif desviacio <= -5:
             estat = "Infrarepresentat"
@@ -55,6 +65,7 @@ def taula_participacio(df: pd.DataFrame, llindar: int = 8) -> pd.DataFrame:
             {
                 "Col·lectiu": col,
                 "Respostes": n,
+                "Mínim": minim,
                 "Població": poblacio,
                 "Taxa resposta": round(taxa, 1),
                 "Pes mostra": round(pes_mostra, 1),
@@ -81,7 +92,11 @@ def alertes_representativitat(taula: pd.DataFrame) -> list[str]:
             )
     return alertes
 
+
+# ---------------------------------------------------------------------------
 # Temes i tendències
+# ---------------------------------------------------------------------------
+
 
 def resum_temes(df: pd.DataFrame) -> pd.DataFrame:
     files = []
@@ -131,7 +146,7 @@ def temes_emergents(evolucio: pd.DataFrame, minim_pp: float = 2.5) -> pd.DataFra
     return evolucio[evolucio["Delta (pp)"] >= minim_pp].copy()
 
 
-def senyals_febles(df: pd.DataFrame, evolucio: pd.DataFrame, llindar_mostra: int = 8) -> pd.DataFrame:
+def senyals_febles(df: pd.DataFrame, evolucio: pd.DataFrame, llindar_mostra: int = ANONIMAT_MIN) -> pd.DataFrame:
     """Temes poc freqüents però molt negatius i amb tendència a l'alça."""
     resum = resum_temes(df)
     if resum.empty:
@@ -153,7 +168,7 @@ def senyals_febles(df: pd.DataFrame, evolucio: pd.DataFrame, llindar_mostra: int
 # ---------------------------------------------------------------------------
 
 
-def cites_per_tema(df: pd.DataFrame, llindar: int = 8, max_cites: int = 3) -> dict[str, list[str]]:
+def cites_per_tema(df: pd.DataFrame, llindar: int = ANONIMAT_MIN, max_cites: int = 3) -> dict[str, list[str]]:
     """Retorna cites netes només per a segments que superen el llindar."""
     resultat: dict[str, list[str]] = {}
     if len(df) < llindar:
@@ -175,7 +190,9 @@ def cites_per_tema(df: pd.DataFrame, llindar: int = 8, max_cites: int = 3) -> di
     return resultat
 
 
+# ---------------------------------------------------------------------------
 # Recomanacions i tancament de cicle
+# ---------------------------------------------------------------------------
 
 RECOMANACIONS_BASE = {
     "Torns i horaris": {
@@ -329,20 +346,19 @@ def proposta_seguiment(df: pd.DataFrame) -> dict:
     }
 
 
+# ---------------------------------------------------------------------------
 # Qualitat del model
+# ---------------------------------------------------------------------------
 
-def precisio_classificacio_millor(df: pd.DataFrame) -> dict[str, float]:
+
+def precisio_classificacio(df: pd.DataFrame) -> dict[str, float]:
     no_buida = df[df["comentari_obert"].astype(str).str.strip() != ""]
     amb_text = no_buida[no_buida["tema_detectat"] != "Altres"]
-    
     if amb_text.empty:
         return {"temes": 0.0, "sentiment": 0.0, "cobertura": 0.0}
-    
-    # F1-Score ponderado: penaliza menos si el modelo falla en categorías con pocos datos
-    temes = f1_score(amb_text["tema_real"], amb_text["tema_detectat"], average='weighted') * 100
-    sentiments = f1_score(amb_text["sentiment_real"], amb_text["sentiment_detectat"], average='weighted') * 100
+    temes = (amb_text["tema_detectat"] == amb_text["tema_real"]).mean() * 100
+    sentiments = (amb_text["sentiment_detectat"] == amb_text["sentiment_real"]).mean() * 100
     cobertura = (no_buida["tema_detectat"] != "Altres").mean() * 100
-    
     return {
         "temes": round(temes, 1),
         "sentiment": round(sentiments, 1),
@@ -350,13 +366,13 @@ def precisio_classificacio_millor(df: pd.DataFrame) -> dict[str, float]:
     }
 
 
-def kpis(df: pd.DataFrame, llindar: int = 8) -> dict[str, float]:
-    taula = taula_participacio(df, llindar)
+def kpis(df: pd.DataFrame, llindar_pct: float = LLINDAR_PCT_DEFECTE) -> dict[str, float]:
+    taula = taula_participacio(df, llindar_pct)
     total_poblacio = sum(POBLACIO.values())
     return {
         "respostes": len(df),
         "taxa_resposta": round(len(df) / total_poblacio * 100, 1),
         "marge_error": marge_error(len(df), total_poblacio),
-        "col_lectius_coberts": int((taula["Respostes"] >= llindar).sum()),
+        "col_lectius_coberts": int((taula["Respostes"] >= taula["Mínim"]).sum()),
         "alertes": int((taula["Estat"] == "Infrarepresentat").sum()),
     }
