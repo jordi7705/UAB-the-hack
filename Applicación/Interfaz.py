@@ -316,8 +316,51 @@ textarea {
 
 hr { border-color: var(--line); }
 
-/* Amaga la barra d'eines de Streamlit (Stop / Deploy) durant la demo */
-[data-testid="stToolbar"] { display: none; }
+/* Amaga Deploy i el menú de Streamlit durant la demo, però NO la barra sencera:
+   dins hi ha el botó per tornar a obrir la barra lateral. */
+[data-testid="stToolbarActions"],
+[data-testid="stAppDeployButton"],
+[data-testid="stMainMenu"] { display: none !important; }
+
+/* Botó per reobrir la barra lateral: visible i amb els colors de la marca */
+[data-testid="stExpandSidebarButton"] {
+    display: flex !important;
+    background: var(--maroon);
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(131,27,30,0.25);
+}
+[data-testid="stExpandSidebarButton"],
+[data-testid="stExpandSidebarButton"] * { color: #FFFFFF !important; fill: #FFFFFF !important; }
+[data-testid="stExpandSidebarButton"]:hover { background: #A3262A; }
+
+/* Títols de Streamlit (st.markdown("### ...")): els estils propis de Streamlit
+   (Source Sans, pes 600, color de text) guanyaven a la regla global. */
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h1,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h2,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h3,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h4,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h5,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h6 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    color: var(--maroon);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+}
+/* El text del títol va dins d'un span/div: sense això la regla global
+   "span, div { font-size: 0.98rem }" l'encongeix. */
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h1 *,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h2 *,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h3 *,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h4 *,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h5 *,
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h6 * {
+    font-size: inherit; font-family: inherit; color: inherit;
+    font-weight: inherit; line-height: inherit; letter-spacing: inherit;
+}
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h3 { font-size: 1.6rem; }
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h4 { font-size: 1.3rem; }
+[data-testid="stMain"] [data-testid="stHeadingWithActionElements"] h5 { font-size: 1.12rem; }
 
 /* Botones desactivados (p. ej. publicar sin aprobación humana) */
 .stButton > button:disabled {
