@@ -9,6 +9,7 @@ per una crida real a un model.
 
 from __future__ import annotations
 
+import unicodedata
 import hashlib
 import io
 import random
