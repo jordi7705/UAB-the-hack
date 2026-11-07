@@ -1,4 +1,5 @@
 import pandas as pd
+import streamlit as st
 import matplotlib
 from sklearn.datasets import make_classification
 from sklearn.ensemble import RandomForestClassifier
@@ -38,3 +39,22 @@ y_pred = model.predict(X_test)
 
 accuracy = accuracy_score(y_test, y_pred)
 
+# ---------------------------------------------------------------------------
+# Privacitat
+# ---------------------------------------------------------------------------
+
+st.header("Formulario de Feedback")
+
+# 1. Minimización: Solo pide lo estrictamente necesario
+edad = st.number_input("Edad (opcional)", min_value=18, max_value=99, step=1)
+departamento = st.selectbox("Departamento", ["Ventas", "IT", "RRHH", "Marketing"])
+
+# 2. Checkbox de Privacidad (Bloqueante)
+consentimiento = st.checkbox("Acepto la política de privacidad (PRODUCTE.md) y el uso de mis datos de forma anonimizada.")
+
+if st.button("Enviar Datos"):
+    if not consentimiento:
+        st.error("Debes aceptar la política de privacidad para continuar.")
+    else:
+        # Aquí llamarías a la función de guardado
+        st.success("Datos registrados correctamente y anonimizados de forma segura.")

@@ -618,7 +618,25 @@ def sentiment_de(text: str) -> int:
         return 1
     return 0
 
+# ---------------------------------------------------------------------------
+# Dades Sintètiques
+# ---------------------------------------------------------------------------
+from faker import Faker 
 
+fake = Faker('es_ES')
+
+def generar_datos_sinteticos(n_muestras=1000):
+    """Genera un DataFrame con datos falsos que respetan la estructura original."""
+    datos = []
+    for _ in range(n_muestras):
+        datos.append({
+            'id_usuario': fake.uuid4(),
+            'edad': random.randint(18, 65),
+            'departamento': random.choice(['Ventas', 'IT', 'RRHH', 'Marketing']),
+            'satisfaccion': random.uniform(1.0, 5.0),
+            'comentario': fake.sentence() # Texto aleatorio
+        })
+    return pd.DataFrame(datos)
 # ---------------------------------------------------------------------------
 # Generació
 # ---------------------------------------------------------------------------
