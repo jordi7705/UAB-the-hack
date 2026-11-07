@@ -43,12 +43,12 @@ PAGINES = [
     "Guió de demo",
 ]
 
-COLORS = ["#831B1E", "#FAB626", "#2F7D5C", "#E32819", "#6F5F5A", "#C9A66B"]
+COLORS = ["#0B1F3A", "#D9A441", "#2F7D5C", "#B3122E", "#5D6B7A", "#7FA6C9"]
 STATUS_COLORS = {
     "Adequat": "#2F7D5C",
-    "Sobre-representat": "#FAB626",
-    "Infrarepresentat": "#E32819",
-    "Ocult (llindar)": "#6F5F5A",
+    "Sobre-representat": "#7FA6C9",
+    "Infrarepresentat": "#B3122E",
+    "Ocult (llindar)": "#5D6B7A",
 }
 
 
@@ -90,11 +90,11 @@ def estil_fig(fig: go.Figure, height: int = 340, marge_esq: int = 10) -> go.Figu
         margin=dict(l=0, r=10, t=28, b=10),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter, sans-serif", color="#241715", size=12),
+        font=dict(family="Inter, sans-serif", color="#1C2430", size=12),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0, title=None),
-        hoverlabel=dict(bgcolor="#831B1E", font_color="#FFFFFF", bordercolor="#831B1E"),
+        hoverlabel=dict(bgcolor="#0B1F3A", font_color="#FFFFFF", bordercolor="#0B1F3A"),
     )
-    fig.update_xaxes(showgrid=True, gridcolor="#EFE2CC", zeroline=False)
+    fig.update_xaxes(showgrid=True, gridcolor="#EAE3D6", zeroline=False)
     fig.update_yaxes(showgrid=False, zeroline=False)
     return fig
 
@@ -118,11 +118,11 @@ with st.sidebar:
     st.markdown("---")
     st.markdown(
         "<div style='font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;"
-        "color:#D8B7A8;font-weight:700;margin-bottom:0.4rem'>Dades de demo</div>",
+        "color:#9FB2C8;font-weight:700;margin-bottom:0.4rem'>Dades de demo</div>",
         unsafe_allow_html=True,
     )
     st.markdown(
-        f"<div style='font-size:0.85rem;color:#F1E4D8'>{len(df_global):,} respostes sintètiques<br>"
+        f"<div style='font-size:0.85rem;color:#DCE4EE'>{len(df_global):,} respostes sintètiques<br>"
         f"2 períodes · seed {st.session_state.seed}</div>",
         unsafe_allow_html=True,
     )
@@ -134,7 +134,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown(
-        "<div style='font-size:0.74rem;color:#D8B7A8;line-height:1.5'>"
+        "<div style='font-size:0.74rem;color:#9FB2C8;line-height:1.5'>"
         "Prototip de demo.<br>Cap dada real de Damm ni de persones treballadores.<br>"
         "No és una eina de vigilància.</div>",
         unsafe_allow_html=True,
@@ -242,7 +242,7 @@ def pagina_inici() -> None:
             st.markdown(
                 f"<div class='callout' style='min-height:190px'>"
                 f"<div class='callout-title'>{titol}</div>"
-                f"<div style='color:#6F5F5A;font-size:0.9rem;line-height:1.45;margin:0.35rem 0 0.6rem 0'>{text}</div>"
+                f"<div style='color:#5D6B7A;font-size:0.9rem;line-height:1.45;margin:0.35rem 0 0.6rem 0'>{text}</div>"
                 f"{ui.pill(tag, 'gold')}</div>",
                 unsafe_allow_html=True,
             )
@@ -371,7 +371,7 @@ def pagina_nova_consulta() -> None:
     st.markdown("<div style='height:0.7rem'></div>", unsafe_allow_html=True)
 
     st.markdown(f"### {consulta['titol']}")
-    st.markdown(f"<div style='color:#6F5F5A;max-width:820px'>{consulta['intro']}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='color:#5D6B7A;max-width:820px'>{consulta['intro']}</div>", unsafe_allow_html=True)
 
     with st.expander("Per què aquesta proposta? (traçabilitat)", expanded=False):
         st.markdown(
@@ -537,7 +537,7 @@ def pagina_participacio() -> None:
                 x=taula["Pes població"],
                 name="Pes a la població",
                 orientation="h",
-                marker_color="#D9C9B5",
+                marker_color="#C9D3DF",
                 text=taula["Pes població"].astype(str) + "%",
                 textposition="outside",
             )
@@ -548,7 +548,7 @@ def pagina_participacio() -> None:
                 x=taula["Pes mostra"],
                 name="Pes a la mostra",
                 orientation="h",
-                marker_color="#831B1E",
+                marker_color="#0B1F3A",
                 text=taula["Pes mostra"].astype(str) + "%",
                 textposition="outside",
             )
@@ -565,7 +565,7 @@ def pagina_participacio() -> None:
             names="canal",
             values="Respostes",
             hole=0.62,
-            color_discrete_sequence=["#831B1E", "#FAB626", "#2F7D5C"],
+            color_discrete_sequence=["#0B1F3A", "#D9A441", "#2F7D5C"],
         )
         fig.update_traces(textinfo="percent", textfont_size=12)
         fig.update_layout(showlegend=True)
@@ -678,7 +678,7 @@ def pagina_analisi() -> None:
                 y="Tema",
                 orientation="h",
                 color="Sentiment mitjà",
-                color_continuous_scale=["#E32819", "#E8D9B5", "#2F7D5C"],
+                color_continuous_scale=["#B3122E", "#E8D9B5", "#2F7D5C"],
                 range_color=[-1, 1],
                 text="Respostes",
             )
@@ -689,7 +689,7 @@ def pagina_analisi() -> None:
         st.markdown("##### Sentiment mitjà per tema")
         if not resum.empty:
             r = resum.sort_values("Sentiment mitjà")
-            colors = ["#E32819" if v < 0 else "#2F7D5C" for v in r["Sentiment mitjà"]]
+            colors = ["#B3122E" if v < 0 else "#2F7D5C" for v in r["Sentiment mitjà"]]
             fig = go.Figure(
                 go.Bar(
                     x=r["Sentiment mitjà"],
@@ -712,8 +712,8 @@ def pagina_analisi() -> None:
             "info",
         )
         fig = go.Figure()
-        fig.add_trace(go.Bar(x=evolucio["Tema"], y=evolucio["T3 (%)"], name="2026-T3", marker_color="#D9C9B5"))
-        fig.add_trace(go.Bar(x=evolucio["Tema"], y=evolucio["T4 (%)"], name="2026-T4", marker_color="#831B1E"))
+        fig.add_trace(go.Bar(x=evolucio["Tema"], y=evolucio["T3 (%)"], name="2026-T3", marker_color="#C9D3DF"))
+        fig.add_trace(go.Bar(x=evolucio["Tema"], y=evolucio["T4 (%)"], name="2026-T4", marker_color="#0B1F3A"))
         fig.update_layout(barmode="group")
         fig.update_xaxes(tickangle=-30)
         fig.update_yaxes(ticksuffix="%")
@@ -806,7 +806,7 @@ def pagina_insights() -> None:
     st.markdown("##### Accions proposades")
     for _, row in recs.iterrows():
         st.markdown(
-            f"<div class='callout' style='margin-bottom:0.6rem;border-left:4px solid #FAB626'>"
+            f"<div class='callout' style='margin-bottom:0.6rem;border-left:4px solid #D9A441'>"
             f"<div style='display:flex;justify-content:space-between;gap:1rem;align-items:center'>"
             f"<div><b>{row['Prioritat']}. {row['Tema']}</b><br>"
             f"<span style='font-size:0.92rem'>{row['Acció proposada']}</span><br>"
@@ -1030,7 +1030,7 @@ PAGINA_FN[st.session_state.nav]()
 
 st.markdown("<div style='height:1.4rem'></div>", unsafe_allow_html=True)
 st.markdown(
-    "<div style='text-align:center;color:#9A8A82;font-size:0.75rem'>"
+    "<div style='text-align:center;color:#8A94A3;font-size:0.75rem'>"
     "Escolta · prototip de demo · dades 100% sintètiques · no és una eina de vigilància"
     "</div>",
     unsafe_allow_html=True,

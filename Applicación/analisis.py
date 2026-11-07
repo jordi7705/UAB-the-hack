@@ -13,6 +13,8 @@ import math
 
 import pandas as pd
 
+from sklearn.metrics import f1_score
+
 from datos import POBLACIO, TEMES, TEMES_ORDRE
 
 
@@ -79,11 +81,7 @@ def alertes_representativitat(taula: pd.DataFrame) -> list[str]:
             )
     return alertes
 
-
-# ---------------------------------------------------------------------------
 # Temes i tendències
-# ---------------------------------------------------------------------------
-
 
 def resum_temes(df: pd.DataFrame) -> pd.DataFrame:
     files = []
@@ -177,9 +175,7 @@ def cites_per_tema(df: pd.DataFrame, llindar: int = 8, max_cites: int = 3) -> di
     return resultat
 
 
-# ---------------------------------------------------------------------------
 # Recomanacions i tancament de cicle
-# ---------------------------------------------------------------------------
 
 RECOMANACIONS_BASE = {
     "Torns i horaris": {
@@ -333,19 +329,20 @@ def proposta_seguiment(df: pd.DataFrame) -> dict:
     }
 
 
-# ---------------------------------------------------------------------------
 # Qualitat del model
-# ---------------------------------------------------------------------------
 
-
-def precisio_classificacio(df: pd.DataFrame) -> dict[str, float]:
+def precisio_classificacio_millor(df: pd.DataFrame) -> dict[str, float]:
     no_buida = df[df["comentari_obert"].astype(str).str.strip() != ""]
     amb_text = no_buida[no_buida["tema_detectat"] != "Altres"]
+    
     if amb_text.empty:
         return {"temes": 0.0, "sentiment": 0.0, "cobertura": 0.0}
-    temes = (amb_text["tema_detectat"] == amb_text["tema_real"]).mean() * 100
-    sentiments = (amb_text["sentiment_detectat"] == amb_text["sentiment_real"]).mean() * 100
+    
+    # F1-Score ponderado: penaliza menos si el modelo falla en categorías con pocos datos
+    temes = f1_score(amb_text["tema_real"], amb_text["tema_detectat"], average='weighted') * 100
+    sentiments = f1_score(amb_text["sentiment_real"], amb_text["sentiment_detectat"], average='weighted') * 100
     cobertura = (no_buida["tema_detectat"] != "Altres").mean() * 100
+    
     return {
         "temes": round(temes, 1),
         "sentiment": round(sentiments, 1),
