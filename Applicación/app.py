@@ -27,7 +27,7 @@ import datos
 # ---------------------------------------------------------------------------
 
 st.set_page_config(
-    page_title="Escolta · Damm",
+    page_title="EscoltDamm",
     page_icon="⭐",
     layout="wide",
     initial_sidebar_state="expanded",
