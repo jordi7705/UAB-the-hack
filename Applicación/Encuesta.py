@@ -3,6 +3,8 @@ import matplotlib
 from sklearn.datasets import make_classification
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 X_synthetic, y_synthetic = make_classification(
     n_samples=200,      # Número de filas (gran escala)
