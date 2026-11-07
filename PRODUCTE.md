@@ -13,8 +13,8 @@ El departament de People (RRHH) llança enquestes de clima, però s'enfronta a t
 ## 3. Regles de Negoci i Privacitat (Guardrails)
 Per garantir la confiança dels treballadors i la utilitat per a RRHH, el sistema es regeix per tres regles innegociables:
 
-* **Regla 1: Privacitat per disseny (Llindar d'Anonimat)**
-  El sistema garanteix l'anonimat absolut de forma matemàtica. S'estableix un llindar mínim de participació per segment (ex. 8 respostes). Si un encreuament de dades (ex. "Logística" + "Torn de nit") no arriba a aquest mínim, el sistema oculta automàticament els resultats. És tècnicament impossible desgranar les dades fins a identificar una persona concreta.
+* **Regla 1: Privacitat i Validesa per Percentatge de Mostra (Llindar Dinàmic)**
+  El sistema no utilitza un tall rígid de nombre de respostes, sinó un **llindar percentual adaptat a la grandària de cada col·lectiu** (Un mínim d'un 15% de participació sobre el cens total d'aquell grup). Si un segment no arriba a aquest percentatge relatiu, el sistema oculta automàticament els resultats per evitar biaixos estadístics i garantir l'anonimat matemàtic en equips petits.
 
 * **Regla 2: IA Segura i Delimitada (Temes Prohibits)**
   La Intel·ligència Artificial no té llibertat absoluta; actua com un assistent guiat. Abans de generar qualsevol microconsulta, el sistema aplica un filtre de "línies vermelles" que impedeix formular preguntes sobre temes sensibles fora del control de clima (ex. salaris, acomiadaments, dades mèdiques). 
