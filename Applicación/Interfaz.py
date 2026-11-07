@@ -12,15 +12,15 @@ CSS = """
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --navy: #0B1F3A;
-    --navy-2: #123459;
-    --gold: #D9A441;
-    --gold-soft: #F3E3BE;
-    --red: #B3122E;
-    --cream: #F6F2EA;
-    --ink: #1C2430;
-    --muted: #5D6B7A;
-    --line: #E4DCCD;
+    --maroon: #831B1E;
+    --maroon-2: #A3262A;
+    --gold: #FAB626;
+    --gold-soft: #FDEBC0;
+    --red: #E32819;
+    --cream: #FBF3E4;
+    --ink: #241715;
+    --muted: #6F5F5A;
+    --line: #EADBC4;
     --green: #2F7D5C;
 }
 
@@ -31,8 +31,8 @@ html, body, [class*="css"] {
 
 [data-testid="stAppViewContainer"] {
     background:
-        radial-gradient(1200px 600px at 85% -10%, rgba(217,164,65,0.10), transparent 60%),
-        radial-gradient(900px 500px at -10% 20%, rgba(11,31,58,0.05), transparent 60%),
+        radial-gradient(1200px 600px at 85% -10%, rgba(250,182,38,0.10), transparent 60%),
+        radial-gradient(900px 500px at -10% 20%, rgba(131,27,30,0.05), transparent 60%),
         var(--cream);
 }
 
@@ -47,7 +47,7 @@ html, body, [class*="css"] {
 
 h1, h2, h3, h4 {
     font-family: 'DM Serif Display', Georgia, serif;
-    color: var(--navy);
+    color: var(--maroon);
     letter-spacing: -0.01em;
     font-weight: 400;
 }
@@ -60,8 +60,8 @@ p, li, label, span, div { font-size: 0.98rem; }
 
 /* ---------------- Sidebar ---------------- */
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0A1B33 0%, #0E2A4A 70%, #123459 100%);
-    border-right: 1px solid rgba(217,164,65,0.25);
+    background: linear-gradient(180deg, #3A0A0D 0%, #5A1216 70%, #831B1E 100%);
+    border-right: 1px solid rgba(250,182,38,0.25);
 }
 [data-testid="stSidebar"] p,
 [data-testid="stSidebar"] span,
@@ -71,7 +71,7 @@ p, li, label, span, div { font-size: 0.98rem; }
 [data-testid="stSidebar"] h3 {
     color: #F3EEE5;
 }
-[data-testid="stSidebar"] .stRadio label p { color: #DCE4EE !important; font-weight: 500; }
+[data-testid="stSidebar"] .stRadio label p { color: #F1E4D8 !important; font-weight: 500; }
 [data-testid="stSidebar"] .stRadio [role="radiogroup"] { gap: 0.15rem; }
 [data-testid="stSidebar"] .stRadio label:hover p { color: #FFFFFF !important; }
 [data-testid="stSidebar"] .stRadio [role="radiogroup"] label {
@@ -83,32 +83,32 @@ p, li, label, span, div { font-size: 0.98rem; }
     background: rgba(255,255,255,0.06);
 }
 [data-testid="stSidebar"] .stRadio [role="radiogroup"] label:has(input:checked) {
-    background: rgba(217,164,65,0.16);
-    box-shadow: inset 3px 0 0 #D9A441;
+    background: rgba(250,182,38,0.16);
+    box-shadow: inset 3px 0 0 #FAB626;
 }
 [data-testid="stSidebar"] .stRadio [role="radiogroup"] label > div:first-child {
     display: none;
 }
 [data-testid="stSidebar"] .stButton > button {
-    background: rgba(217,164,65,0.14);
-    border: 1px solid rgba(217,164,65,0.55);
+    background: rgba(250,182,38,0.14);
+    border: 1px solid rgba(250,182,38,0.55);
     color: #F6E7C4;
     font-weight: 600;
 }
 [data-testid="stSidebar"] .stButton > button:hover {
-    background: rgba(217,164,65,0.26);
-    border-color: #D9A441;
+    background: rgba(250,182,38,0.26);
+    border-color: #FAB626;
     color: #FFFFFF;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #D9A441, #B9822B);
-    border: 1px solid #D9A441;
-    color: #0B1F3A;
+    background: linear-gradient(135deg, #FAB626, #D99A12);
+    border: 1px solid #FAB626;
+    color: #831B1E;
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
-    background: linear-gradient(135deg, #E4B45A, #C68F31);
-    color: #0B1F3A;
+    background: linear-gradient(135deg, #FFC94D, #E8A81A);
+    color: #831B1E;
 }
 [data-testid="stSidebar"] .stButton > button p { color: inherit !important; }
 [data-testid="stSidebar"] hr { border-color: rgba(255,255,255,0.12); }
@@ -122,10 +122,10 @@ p, li, label, span, div { font-size: 0.98rem; }
 }
 .brand-star {
     width: 40px; height: 40px; border-radius: 12px;
-    background: linear-gradient(135deg, var(--gold), #B9822B);
-    color: #0B1F3A; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--gold), #D99A12);
+    color: #831B1E; display: flex; align-items: center; justify-content: center;
     font-size: 1.3rem; font-weight: 700;
-    box-shadow: 0 6px 18px rgba(217,164,65,0.35);
+    box-shadow: 0 6px 18px rgba(250,182,38,0.35);
 }
 .brand-name {
     font-family: 'DM Serif Display', Georgia, serif;
@@ -133,31 +133,31 @@ p, li, label, span, div { font-size: 0.98rem; }
 }
 .brand-sub {
     font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
-    color: #9FB2C8; margin-top: 0.18rem;
+    color: #D8B7A8; margin-top: 0.18rem;
 }
 
 /* ---------------- Hero ---------------- */
 .hero {
     position: relative;
-    background: linear-gradient(120deg, #0B1F3A 0%, #123459 58%, #1B4470 100%);
+    background: linear-gradient(120deg, #4A0F12 0%, #831B1E 58%, #B3262B 100%);
     border-radius: 22px;
     padding: 2.1rem 2.3rem 2rem 2.3rem;
-    color: #F6F2EA;
+    color: #FBF3E4;
     overflow: hidden;
-    box-shadow: 0 18px 50px rgba(11,31,58,0.22);
+    box-shadow: 0 18px 50px rgba(131,27,30,0.22);
     margin-bottom: 1.4rem;
 }
 .hero::after {
     content: "";
     position: absolute; right: -70px; top: -90px;
     width: 320px; height: 320px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(217,164,65,0.30), rgba(217,164,65,0) 70%);
+    background: radial-gradient(circle, rgba(250,182,38,0.30), rgba(250,182,38,0) 70%);
 }
 .hero::before {
     content: "";
     position: absolute; right: 60px; bottom: -60px;
     width: 180px; height: 180px; border-radius: 50%;
-    border: 1px solid rgba(217,164,65,0.35);
+    border: 1px solid rgba(250,182,38,0.35);
 }
 .hero-kicker {
     font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
@@ -170,13 +170,13 @@ p, li, label, span, div { font-size: 0.98rem; }
 }
 .hero-title em { color: var(--gold); font-style: italic; }
 .hero-text {
-    color: #C9D6E4; max-width: 720px; font-size: 1.02rem; line-height: 1.55;
+    color: #F0D9CF; max-width: 720px; font-size: 1.02rem; line-height: 1.55;
     margin-bottom: 0.1rem;
 }
 .hero-badges { margin-top: 1.05rem; display: flex; flex-wrap: wrap; gap: 0.45rem; }
 .hero-badge {
-    border: 1px solid rgba(217,164,65,0.45);
-    background: rgba(217,164,65,0.10);
+    border: 1px solid rgba(250,182,38,0.45);
+    background: rgba(250,182,38,0.10);
     color: #F0D9A6; border-radius: 999px;
     padding: 0.28rem 0.72rem; font-size: 0.76rem; letter-spacing: 0.02em;
 }
@@ -194,11 +194,11 @@ p, li, label, span, div { font-size: 0.98rem; }
 }
 .metric::before {
     content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-    background: linear-gradient(180deg, var(--gold), #B9822B);
+    background: linear-gradient(180deg, var(--gold), #D99A12);
 }
 .metric-value {
     font-family: 'DM Serif Display', Georgia, serif;
-    font-size: 1.95rem; color: var(--navy); line-height: 1.05;
+    font-size: 1.95rem; color: var(--maroon); line-height: 1.05;
 }
 .metric-label {
     font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.10em;
@@ -213,7 +213,7 @@ p, li, label, span, div { font-size: 0.98rem; }
 }
 .section-title {
     font-family: 'DM Serif Display', Georgia, serif;
-    font-size: 1.6rem; color: var(--navy); margin-bottom: 0.2rem;
+    font-size: 1.6rem; color: var(--maroon); margin-bottom: 0.2rem;
 }
 .section-sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 1rem; }
 
@@ -222,11 +222,11 @@ p, li, label, span, div { font-size: 0.98rem; }
     font-size: 0.72rem; font-weight: 600; letter-spacing: 0.02em;
     border: 1px solid transparent; white-space: nowrap;
 }
-.pill-gold { background: var(--gold-soft); color: #7A5410; border-color: #E8CD93; }
+.pill-gold { background: var(--gold-soft); color: #7A4A00; border-color: #F4D68A; }
 .pill-green { background: #DFF0E7; color: #1F6046; border-color: #B9DCCB; }
-.pill-red { background: #F7DDE1; color: #8E1026; border-color: #EBB9C2; }
-.pill-blue { background: #DDE8F4; color: #163C63; border-color: #BBD0E6; }
-.pill-grey { background: #ECEAE4; color: #55606D; border-color: #DAD5C9; }
+.pill-red { background: #FBE0DC; color: #8A1A12; border-color: #F2B8B0; }
+.pill-blue { background: #F3DCDD; color: #6B1519; border-color: #E3B9BB; }
+.pill-grey { background: #F0E9DD; color: #5F524C; border-color: #DDD0BC; }
 
 /* ---------------- Cicle ---------------- */
 .cycle {
@@ -239,10 +239,10 @@ p, li, label, span, div { font-size: 0.98rem; }
 }
 .cycle-num {
     width: 22px; height: 22px; border-radius: 50%; margin: 0 auto 0.35rem auto;
-    background: var(--navy); color: #fff; font-size: 0.7rem; font-weight: 700;
+    background: var(--maroon); color: #fff; font-size: 0.7rem; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
 }
-.cycle-label { font-size: 0.68rem; line-height: 1.2; color: var(--navy); font-weight: 600; }
+.cycle-label { font-size: 0.68rem; line-height: 1.2; color: var(--maroon); font-weight: 600; }
 @media (max-width: 900px) { .cycle { grid-template-columns: repeat(4, 1fr); } }
 
 /* ---------------- Callouts ---------------- */
@@ -252,8 +252,8 @@ p, li, label, span, div { font-size: 0.98rem; }
 }
 .callout-warn { background: #FFF6E3; border-color: #EED9A8; color: #6B4E11; }
 .callout-ok { background: #EAF5EF; border-color: #BFDDCD; color: #1F5A42; }
-.callout-danger { background: #FCEBEE; border-color: #EFC3CB; color: #82142A; }
-.callout-info { background: #EDF3FA; border-color: #C6D8EC; color: #1B3E63; }
+.callout-danger { background: #FDECE9; border-color: #F3C4BD; color: #7F1B14; }
+.callout-info { background: #F4EFE8; border-color: #DDD2C2; color: #4A3F38; }
 .callout b { color: inherit; }
 .callout-title { font-weight: 700; margin-bottom: 0.25rem; }
 
@@ -280,20 +280,20 @@ p, li, label, span, div { font-size: 0.98rem; }
 
 /* ---------------- Streamlit widgets ---------------- */
 .stButton > button {
-    border-radius: 10px; font-weight: 600; border: 1px solid var(--navy);
+    border-radius: 10px; font-weight: 600; border: 1px solid var(--maroon);
     padding: 0.45rem 1.1rem; transition: all 0.15s ease;
 }
 .stButton > button[kind="primary"] {
-    background: var(--navy); color: #FFFFFF; border: 1px solid var(--navy);
-    box-shadow: 0 6px 16px rgba(11,31,58,0.18);
+    background: var(--maroon); color: #FFFFFF; border: 1px solid var(--maroon);
+    box-shadow: 0 6px 16px rgba(131,27,30,0.18);
 }
 .stButton > button[kind="primary"]:hover {
-    background: #16395F; border-color: #16395F; transform: translateY(-1px);
+    background: #A3262A; border-color: #A3262A; transform: translateY(-1px);
 }
 .stButton > button[kind="secondary"] {
-    background: #FFFFFF; color: var(--navy); border: 1px solid #C9D3DF;
+    background: #FFFFFF; color: var(--maroon); border: 1px solid #D9C9B5;
 }
-.stButton > button[kind="secondary"]:hover { border-color: var(--gold); color: #7A5410; }
+.stButton > button[kind="secondary"]:hover { border-color: var(--gold); color: #7A4A00; }
 
 [data-testid="stForm"] {
     background: #FFFFFF; border: 1px solid var(--line); border-radius: 16px;
@@ -318,7 +318,23 @@ hr { border-color: var(--line); }
 
 /* Amaga la barra d'eines de Streamlit (Stop / Deploy) durant la demo */
 [data-testid="stToolbar"] { display: none; }
-</style>
+
+/* Botones desactivados (p. ej. publicar sin aprobación humana) */
+.stButton > button:disabled {
+    opacity: 0.45; cursor: not-allowed; box-shadow: none; transform: none;
+}
+
+/* Botón secundario de la barra lateral: el estilo genérico lo dejaba blanco con texto invisible */
+[data-testid="stSidebar"] .stButton > button[kind="secondary"] {
+    background: rgba(250,182,38,0.14);
+    border: 1px solid rgba(250,182,38,0.55);
+    color: #F6E7C4;
+}
+[data-testid="stSidebar"] .stButton > button[kind="secondary"]:hover {
+    background: rgba(250,182,38,0.26);
+    border-color: #FAB626;
+    color: #FFFFFF;
+}
 """
 
 
@@ -423,8 +439,8 @@ def cicle_escolta(pas_actiu: int = 0) -> None:
     html = '<div class="cycle">'
     for i, p in enumerate(passos, start=1):
         actiu = i <= pas_actiu
-        estil = "background:#0B1F3A;color:#fff;border-color:#0B1F3A;" if actiu else ""
-        estil_num = "background:#D9A441;color:#0B1F3A;" if actiu else ""
+        estil = "background:#831B1E;color:#fff;border-color:#831B1E;" if actiu else ""
+        estil_num = "background:#FAB626;color:#831B1E;" if actiu else ""
         estil_text = "color:#fff;" if actiu else ""
         html += (
             f'<div class="cycle-step" style="{estil}">'
