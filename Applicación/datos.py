@@ -20,6 +20,8 @@ import unicodedata
 from datetime import date, timedelta
 
 import pandas as pd
+import hashlib
+import os
 
 # ---------------------------------------------------------------------------
 # Constants de domini
@@ -637,10 +639,29 @@ def generar_datos_sinteticos(n_muestras=1000):
             'comentario': fake.sentence() # Texto aleatorio
         })
     return pd.DataFrame(datos)
+
+# ---------------------------------------------------------------------------
+# Anonimitació i Hash
+# ---------------------------------------------------------------------------
+
+def anonimizar_dataset(df, columnas_sensibles):
+    """Aplica un hash irreversible a las columnas con PII (Información Personal Identificable)."""
+    df_seguro = df.copy()
+    
+    # Obtener el salt del entorno (NUNCA hardcodear contraseñas)
+    # Asegúrate de cargar las variables con dotenv en app.py
+    salt = os.getenv("HASH_SALT", "default_hackathon_salt").encode()
+    
+    for col in columnas_sensibles:
+        if col in df_seguro.columns:
+            df_seguro[col] = df_seguro[col].apply(
+                lambda x: hashlib.sha256(str(x).encode() + salt).hexdigest()
+            )
+    return df_seguro
+
 # ---------------------------------------------------------------------------
 # Generació
 # ---------------------------------------------------------------------------
-
 
 def _normalitza_pesos(pesos: dict[str, float]) -> list[float]:
     total = sum(pesos.values())
