@@ -75,7 +75,7 @@ y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 
 # ---------------------------------------------------------------------------
-# GENERACIÓ DE MICROCONSULTES
+# GENERACIÓ DE MICROCONSULTES hola
 # ---------------------------------------------------------------------------
 
 def generar_consulta(necessitat: dict, variacio: int = 0) -> dict:
