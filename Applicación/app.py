@@ -652,7 +652,7 @@ def pagina_analisi() -> None:
 
     resum = analisis.resum_temes(df)
     evolucio = analisis.evolucio_temes(df_global.copy()) if periode == "Tots" else pd.DataFrame()
-    precisio = analisis.precisio_classificacio(df_global)
+    precisio = analisis.precisio_classificacio_millor(df_global)
     n_pii = int((df_global["pii_eliminada"].astype(str).str.strip() != "").sum())
 
     cols = st.columns(4)
