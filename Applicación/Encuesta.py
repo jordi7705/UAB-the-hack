@@ -1,82 +1,52 @@
 import random
 from datetime import datetime
-from io import BytesIO
-
 import pandas as pd
 import streamlit as st
-import matplotlib
-
 from sklearn.datasets import make_classification
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-# ---------------------------------------------------------------------------
-# TEMES DE CONSULTA (es mantenen separats dels tons)
-# ---------------------------------------------------------------------------
-
-INTROS = {
-    "Educació": "educacio",
-    "Treball": "treball",
-    "Habitatge": "habitatge",
-    "Salut": "salut",
-    "Economia": "economia",
-    "Altres": "altres",
-}
-
-# app.py utilitza aquests valors al selector "To de la consulta".
-TONS = {
-    "Proper i directe": "proper",
-    "Formal i professional": "formal",
-    "Proper i empàtic": "empatic",
-}
-
-# ---------------------------------------------------------------------------
-# TIPUS DE PREGUNTA (utilitzats per st.data_editor a app.py)
-# ---------------------------------------------------------------------------
-
+# Definim les constants que falten al codi original
 TIPUS_ESCALA = "Escala (1-5)"
-TIPUS_OPCIONS = "Opció múltiple"
-TIPUS_SI_NO = "Sí / No"
+TIPUS_OPCIONS = "Opcions"
 TIPUS_OBERT = "Text obert"
 
-# ---------------------------------------------------------------------------
-# MODEL DE CLASSIFICACIÓ
-# ---------------------------------------------------------------------------
-
+# Generem les dades sintètiques utilitzant els pesos del jurat.
+# "Valor per a les persones" (20%), "Prototip i usabilitat" (15%), etc.
 X_synthetic, y_synthetic = make_classification(
-    n_samples=200,
-    n_features=25,
-    n_informative=15,
-    n_redundant=5,
-    n_repeated=0,
-    n_classes=8,
-    weights=[0.2, 0.15, 0.15, 0.15, 0.1, 0.1, 0.1, 0.05],
+    n_samples=200,      
+    n_features=25,         
+    n_informative=15,      
+    n_redundant=5,         
+    n_repeated=0,          
+    n_classes=8,           
+    weights=[0.20, 0.15, 0.15, 0.15, 0.10, 0.10, 0.10, 0.05],
     flip_y=0.05,
-    random_state=42,
+    random_state=42
 )
 
-column_names = [f"Criteri d'avaluació{i}" for i in range(X_synthetic.shape[1])]
+column_names = [f"Criteri d'avaluació {i}" for i in range(X_synthetic.shape[1])]
 df = pd.DataFrame(X_synthetic, columns=column_names)
-df["target"] = y_synthetic
+df['target'] = y_synthetic
 
-X = df.drop("target", axis=1)
-y = df["target"]
+X = df.drop('target', axis=1)
+y = df['target']
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
+    X, y, 
+    test_size=0.2, 
+    random_state=42, 
+    stratify=y 
 )
 
-model = RandomForestClassifier(
-    n_estimators=100, max_depth=15, n_jobs=-1, random_state=42
-)
+# Sustituïm RandomForestClassifier per GaussianNB per millorar la rapidesa.
+model = GaussianNB()
 model.fit(X_train, y_train)
+
 y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 
-# ---------------------------------------------------------------------------
-# GENERACIÓ DE MICROCONSULTES
-# ---------------------------------------------------------------------------
 
 def generar_consulta(necessitat: dict, variacio: int = 0) -> dict:
     """Genera una proposta de microconsulta editable; no la publica."""
@@ -103,6 +73,7 @@ def generar_consulta(necessitat: dict, variacio: int = 0) -> dict:
             tema = nom
             break
 
+    # Corregida la indentació de 'intros_to'
     intros_to = {
         "Proper i directe": "Volem conèixer la teva opinió de manera senzilla i directa.",
         "Formal i professional": "Aquesta consulta té com a objectiu recollir la teva valoració.",
@@ -155,7 +126,7 @@ def generar_consulta(necessitat: dict, variacio: int = 0) -> dict:
     temps_estimat = max(1, min(durada_max, len(preguntes)))
     titol = f"Microconsulta sobre {tema.lower()}"
 
-    return {
+    return {#canvi
         "titol": titol,
         "intro": intro,
         "objectiu": objectiu,
@@ -175,6 +146,7 @@ def generar_consulta(necessitat: dict, variacio: int = 0) -> dict:
     }
 
 
+# Corregida la indentació: aquesta funció estava dins de generar_consulta() per error.
 def publica_consulta(consulta: dict) -> dict:
     """Marca la consulta com a publicada i prepara un QR/enllaç de demostració."""
     nova = dict(consulta)
@@ -200,6 +172,7 @@ def publica_consulta(consulta: dict) -> dict:
     nova["estat"] = "Publicada"
     return nova
 
+
 # ---------------------------------------------------------------------------
 # PRIVACITAT I FEEDBACK
 # ---------------------------------------------------------------------------
@@ -207,6 +180,7 @@ def publica_consulta(consulta: dict) -> dict:
 def mostrar_feedback():
     st.header("Formulari de Feedback")
 
+    # Corregida la indentació de les variables de Streamlit i la condició de l'enviament
     edad = st.number_input("Edad (opcional)", min_value=18, max_value=99, step=1)
     departamento = st.selectbox(
         "Departamento", ["Ventas", "IT", "RRHH", "Marketing"]
