@@ -15,6 +15,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+from io import BytesIO
 
 import Encuesta
 import Interfaz as ui
@@ -80,6 +81,17 @@ df_global = carrega_dades(st.session_state.seed, st.session_state.n_respostes)
 llindar = st.session_state.llindar
 
 
+def colectius_amagats() -> list[str]:
+    """Col·lectius per sota de l'objectiu que l'usuari ha decidit no representar.
+
+    Es calculen sobre tot el conjunt de dades, perquè siguin els mateixos a totes les pàgines.
+    """
+    if st.session_state.get("mostra_sota", True):
+        return []
+    taula = analisis.taula_participacio(df_global, st.session_state.llindar)
+    return taula.loc[taula["Estat"].isin(["Infrarepresentat", "Ocult (llindar)"]), "Col·lectiu"].tolist()
+
+
 def ves(pagina: str) -> None:
     st.session_state.nav = pagina
 
@@ -126,7 +138,14 @@ with st.sidebar:
         f"2 períodes · seed {st.session_state.seed}</div>",
         unsafe_allow_html=True,
     )
-    st.slider("Llindar mínim per col·lectiu (% de la població)", 5, 25, key="llindar", format="%d%%")
+    st.slider("Objectiu de resposta per col·lectiu (% de la població)", 5, 25, key="llindar", format="%d%%")
+    st.toggle(
+        "Mostrar col·lectius per sota de l'objectiu",
+        value=True,
+        key="mostra_sota",
+        help="Si el desactives, Participació i Anàlisi deixen de representar els col·lectius "
+        "que no assoleixen l'objectiu de resposta. Les alertes es mantenen.",
+    )
     if st.button("Regenerar dades", width="stretch"):
         st.session_state.seed += 1
         st.cache_data.clear()
@@ -189,7 +208,7 @@ def pagina_inici() -> None:
     with cols[2]:
         ui.metrica(f"±{k['marge_error']} pp", "Marge d'error", "95% de confiança")
     with cols[3]:
-        ui.metrica(f"{k['col_lectius_coberts']}/5", "Col·lectius coberts", "per sobre del llindar")
+        ui.metrica(f"{k['col_lectius_coberts']}/5", "Col·lectius coberts", f"han assolit el {llindar}% de resposta")
     with cols[4]:
         ui.metrica(f"{k['alertes']}", "Alertes de mostra", "segments infrarepresentats")
 
@@ -326,7 +345,7 @@ def pagina_nova_consulta() -> None:
                 canal = st.selectbox("Canal principal", datos.CANALS, index=0)
             with col2:
                 context = st.text_input("Context (opcional)", value="Nou sistema de torns · octubre 2026")
-                to = st.radio("To de la consulta", list(Encuesta.INTROS.keys()), horizontal=False)
+                to = st.radio("To de la consulta", list(Encuesta.TONS.keys()), horizontal=False)
                 prohibits = st.multiselect(
                     "Temes que NO s'han de preguntar",
                     ["Salari", "Salut", "Torns", "Lideratge", "Conciliació", "Formació", "Eines"],
@@ -441,7 +460,9 @@ def pagina_nova_consulta() -> None:
         st.success("Consulta publicada amb aprovació humana. Ja es pot compartir.")
         p1, p2 = st.columns([1, 2.2])
         with p1:
-            st.image(consulta["qr"], caption="QR per a planta i logística", width=210)
+            qr_bytes = BytesIO()
+            consulta["qr"].save(qr_bytes, format="PNG")
+            st.image(qr_bytes.getvalue(), caption="QR per a planta i logística", width=210)
         with p2:
             st.markdown("**Enllaç de participació (simulat via API Typeform)**")
             st.code(consulta["enllac"], language=None)
@@ -523,9 +544,19 @@ def pagina_participacio() -> None:
     with cols[2]:
         ui.metrica(f"±{k['marge_error']} pp", "Marge d'error global", "95% de confiança")
     with cols[3]:
-        ui.metrica(f"{len(alertes)}", "Segments a vigilar", f"llindar mínim: {llindar}% per col·lectiu")
+        ui.metrica(f"{len(alertes)}", "Segments a vigilar", f"objectiu: {llindar}% per col·lectiu")
 
     st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
+
+    # Els col·lectius per sota de l'objectiu es poden amagar de la vista amb el botó de la
+    # barra lateral. Les alertes de sota se segueixen mostrant sempre: no s'amaga que falten.
+    amagats = colectius_amagats()
+    taula_vista = taula[~taula["Col·lectiu"].isin(amagats)]
+    df_vista = df[~df["col·lectiu"].isin(amagats)]
+    if amagats:
+        st.caption(f"Vista sense: {', '.join(amagats)}. Segueixen comptant als totals i a les alertes.")
+    if taula_vista.empty:
+        st.info("Cap col·lectiu ha assolit l'objectiu de resposta. Activa el botó de la barra lateral per veure'ls tots.")
 
     g1, g2 = st.columns([1.55, 1])
     with g1:
@@ -533,33 +564,33 @@ def pagina_participacio() -> None:
         fig = go.Figure()
         fig.add_trace(
             go.Bar(
-                y=taula["Col·lectiu"],
-                x=taula["Pes població"],
+                y=taula_vista["Col·lectiu"],
+                x=taula_vista["Pes població"],
                 name="Pes a la població",
                 orientation="h",
                 marker_color="#D9C9B5",
-                text=taula["Pes població"].astype(str) + "%",
+                text=taula_vista["Pes població"].astype(str) + "%",
                 textposition="outside",
             )
         )
         fig.add_trace(
             go.Bar(
-                y=taula["Col·lectiu"],
-                x=taula["Pes mostra"],
+                y=taula_vista["Col·lectiu"],
+                x=taula_vista["Pes mostra"],
                 name="Pes a la mostra",
                 orientation="h",
                 marker_color="#831B1E",
-                text=taula["Pes mostra"].astype(str) + "%",
+                text=taula_vista["Pes mostra"].astype(str) + "%",
                 textposition="outside",
             )
         )
         fig.update_layout(barmode="group")
-        fig.update_xaxes(ticksuffix="%", range=[0, max(65, taula["Pes mostra"].max() + 12)])
+        fig.update_xaxes(ticksuffix="%", range=[0, max(65, (taula_vista["Pes mostra"].max() if not taula_vista.empty else 0) + 12)])
         st.plotly_chart(estil_fig(fig, height=330), width="stretch")
 
     with g2:
         st.markdown("##### Canal de participació")
-        canal = df.groupby("canal").size().reset_index(name="Respostes")
+        canal = df_vista.groupby("canal").size().reset_index(name="Respostes")
         fig = px.pie(
             canal,
             names="canal",
@@ -573,7 +604,7 @@ def pagina_participacio() -> None:
 
     st.markdown("##### Detall per col·lectiu")
     st.dataframe(
-        taula,
+        taula_vista,
         width="stretch",
         hide_index=True,
         column_config={
@@ -626,15 +657,23 @@ def pagina_analisi() -> None:
         "Anàlisi explicable: cada etiqueta es pot justificar amb les paraules que l'han activada.",
     )
 
+    amagats = colectius_amagats()
+    col_visibles = [c for c in datos.COL_LECTIUS if c not in amagats]
+    # Les dades de base d'aquesta pàgina no inclouen els col·lectius que s'han decidit no representar.
+    df_base = df_global[~df_global["col·lectiu"].isin(amagats)]
+
     f1, f2, f3 = st.columns([1, 1.2, 1.2])
     with f1:
         periode = st.selectbox("Període", ["Tots"] + datos.PERIODES, index=0, key="an_periode")
     with f2:
-        col_sel = st.multiselect("Col·lectiu", datos.COL_LECTIUS, default=datos.COL_LECTIUS, key="an_col")
+        col_sel = st.multiselect("Col·lectiu", col_visibles, default=col_visibles, key="an_col_" + "_".join(col_visibles))
     with f3:
         nomes_amb_text = st.checkbox("Només comentaris amb text", value=True)
 
-    df = df_global.copy()
+    if amagats:
+        st.caption(f"Anàlisi sense: {', '.join(amagats)} (per sota de l'objectiu de resposta; botó de la barra lateral).")
+
+    df = df_base.copy()
     if periode != "Tots":
         df = df[df["període"] == periode]
     if col_sel:
@@ -651,9 +690,9 @@ def pagina_analisi() -> None:
         return
 
     resum = analisis.resum_temes(df)
-    evolucio = analisis.evolucio_temes(df_global.copy()) if periode == "Tots" else pd.DataFrame()
-    precisio = analisis.precisio_classificacio(df_global)
-    n_pii = int((df_global["pii_eliminada"].astype(str).str.strip() != "").sum())
+    evolucio = analisis.evolucio_temes(df_base.copy()) if periode == "Tots" else pd.DataFrame()
+    precisio = analisis.precisio_classificacio(df_base)
+    n_pii = int((df_base["pii_eliminada"].astype(str).str.strip() != "").sum())
 
     cols = st.columns(4)
     with cols[0]:
@@ -888,14 +927,14 @@ def pagina_privacitat() -> None:
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        ui.callout("Sempre agregat", "Mai es mostren respostes individuals. El llindar mínim és un percentatge de la població de cada col·lectiu (configurable, 5-25%) i mai baixa de 8 respostes en cites i senyals.", "ok")
+        ui.callout("Sempre agregat", "Mai es mostren respostes individuals. L'objectiu de resposta és un percentatge de la població de cada col·lectiu (configurable, 5-25%): per sota es mostra amb avís. Només s'oculta una mostra de menys de 8 respostes.", "ok")
     with c2:
         ui.callout("Minimització", "Només es recullen els camps necessaris. Els comentaris es netegen de PII abans d'analitzar-los.", "ok")
     with c3:
         ui.callout("Control humà", "La IA proposa consultes i recomanacions; les persones validen abans de publicar i actuar.", "ok")
 
     st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
-    ui.seccio("Configuració", "Llindar mínim de mostra", "Prova com canvia el dashboard en moure el llindar (% de la població de cada col·lectiu).")
+    ui.seccio("Configuració", "Llindar mínim de mostra", "Prova com canvien els avisos en moure l'objectiu de resposta (% de la població de cada col·lectiu).")
 
     if "llindar_privacy" not in st.session_state:
         st.session_state.llindar_privacy = st.session_state.llindar
@@ -904,7 +943,7 @@ def pagina_privacitat() -> None:
         st.session_state.llindar = int(st.session_state.llindar_privacy)
 
     st.slider(
-        "Taxa de resposta mínima per mostrar un col·lectiu (% de la població)",
+        "Objectiu de taxa de resposta per col·lectiu (% de la població)",
         5,
         25,
         key="llindar_privacy",
@@ -913,10 +952,11 @@ def pagina_privacitat() -> None:
     )
 
     taula = analisis.taula_participacio(df_global, st.session_state.llindar)
-    ocults = taula[taula["Respostes"] < taula["Mínim"]]
+    sota = taula[taula["Respostes"] < taula["Mínim"]]
+    ocults = taula[taula["Respostes"] < analisis.ANONIMAT_MIN]
     st.markdown(
-        f"Amb el llindar actual, **{len(ocults)} col·lectius** quedarien ocults. "
-        f"El total mostrat seria de **{int(taula[taula['Respostes'] >= taula['Mínim']]['Respostes'].sum()):,} respostes**."
+        f"Amb l'objectiu actual, **{len(sota)} col·lectius** quedarien per sota i es mostrarien amb avís. "
+        f"Ocults per privacitat (menys de {analisis.ANONIMAT_MIN} respostes): **{len(ocults)}**."
     )
 
     st.markdown("##### Esquema de dades (orientatiu)")

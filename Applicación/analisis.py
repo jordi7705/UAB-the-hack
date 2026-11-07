@@ -31,12 +31,14 @@ def marge_error(n: int, poblacio: int, z: float = 1.96) -> float:
 
 # Mínim absolut per protegir l'anonimat (cites, senyals febles i talls filtrats).
 ANONIMAT_MIN = 8
-# Mínim de respostes per col·lectiu, com a % de la seva població.
+# Objectiu de resposta per col·lectiu, com a % de la seva població.
+# Per sota de l'objectiu el col·lectiu es mostra amb avís; només s'oculta
+# si té menys de ANONIMAT_MIN respostes (privacitat).
 LLINDAR_PCT_DEFECTE = 15
 
 
 def llindar_colectiu(col: str, llindar_pct: float = LLINDAR_PCT_DEFECTE) -> int:
-    """Respostes mínimes per mostrar un col·lectiu: llindar_pct % de la seva població."""
+    """Respostes objectiu d'un col·lectiu: llindar_pct % de la seva població."""
     return math.ceil(POBLACIO[col] * llindar_pct / 100)
 
 
@@ -53,9 +55,9 @@ def taula_participacio(df: pd.DataFrame, llindar_pct: float = LLINDAR_PCT_DEFECT
         pes_poblacio = poblacio / total_poblacio * 100
         desviacio = pes_mostra - pes_poblacio
         minim = llindar_colectiu(col, llindar_pct)
-        if n < minim:
+        if n < ANONIMAT_MIN:
             estat = "Ocult (llindar)"
-        elif desviacio <= -5:
+        elif n < minim or desviacio <= -5:
             estat = "Infrarepresentat"
         elif desviacio >= 5:
             estat = "Sobre-representat"
@@ -84,7 +86,7 @@ def alertes_representativitat(taula: pd.DataFrame) -> list[str]:
         if row["Estat"] == "Infrarepresentat":
             alertes.append(
                 f"{row['Col·lectiu']}: {row['Respostes']} respostes "
-                f"({row['Taxa resposta']}% de resposta, {abs(row['Desviació (pp)']):.1f} pp per sota)."
+                f"({row['Taxa resposta']}% de resposta; l'objectiu són {row['Mínim']})."
             )
         elif row["Estat"] == "Ocult (llindar)":
             alertes.append(
@@ -373,6 +375,6 @@ def kpis(df: pd.DataFrame, llindar_pct: float = LLINDAR_PCT_DEFECTE) -> dict[str
         "respostes": len(df),
         "taxa_resposta": round(len(df) / total_poblacio * 100, 1),
         "marge_error": marge_error(len(df), total_poblacio),
-        "col_lectius_coberts": int((taula["Respostes"] >= taula["Mínim"]).sum()),
+        "col_lectius_coberts": int((taula["Respostes"] >= taula["Mínim"]).sum()),  # han assolit l'objectiu
         "alertes": int((taula["Estat"] == "Infrarepresentat").sum()),
     }
