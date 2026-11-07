@@ -27,8 +27,8 @@ TEMES_PROHIBITS_CLAU = {
     "torns": ["torn", "horari"],
     "lideratge": ["cap", "lider", "manager"],
     "conciliacio": ["conciliacio", "familia"],
-    "formacio": ["formacio", "curs"],
-    "eines": ["eina", "sistema", "aplicacio"],
+    "formacio": ["formacio"],
+    "eines": ["eines", "eina", "sistema", "aplicacio", "proces"],
 }
 
 # Preguntes per tema: (escala, oberta, opcions múltiples)
@@ -168,10 +168,17 @@ def _detecta_temes_objectiu(objectiu: str) -> list[str]:
     return trobats
 
 
+def _sense_accents(text: str) -> str:
+    """Minúscules i sense accents, per comparar "Conciliació" amb "conciliacio"."""
+    nfd = unicodedata.normalize("NFD", text.lower())
+    return "".join(c for c in nfd if unicodedata.category(c) != "Mn")
+
+
 def _esta_prohibit(tema: str, prohibits: list[str]) -> bool:
-    tema_net = tema.lower()
+    tema_net = _sense_accents(tema)
     for p in prohibits:
-        claus = TEMES_PROHIBITS_CLAU.get(p.lower(), [p.lower()])
+        p_net = _sense_accents(p)
+        claus = TEMES_PROHIBITS_CLAU.get(p_net, [p_net])
         if any(c in tema_net for c in claus):
             return True
     return False
